@@ -21,3 +21,5 @@ db/neo4j
 # I needed to request access to these files
 db/multimedia.csv
 db/occurrence.csv
+
+.env*
