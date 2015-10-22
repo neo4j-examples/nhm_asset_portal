@@ -75,7 +75,6 @@ class Specimen < GraphStarter::Asset
   property :clutch_size
   property :associated_media
   property :phylum
-  property :sub_department
   property :cultivated
   property :host_rock
   property :kind_of_object
