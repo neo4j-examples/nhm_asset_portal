@@ -26,7 +26,7 @@ gem 'dotenv-rails', require: 'dotenv/rails-now', group: [:development, :test]
 
 gem 'graph_starter', '~> 0.4.0'
 
-gem 'scout_apm'
+gem 'devise-neo4j'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
