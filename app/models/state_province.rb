@@ -1,4 +1,6 @@
 class StateProvince < GraphStarter::Asset
+  property :title
+
   has_one :out, :country, type: :IN_COUNTRY
   has_many :in, :localities, origin: :state_province
   has_many :in, :specimens, origin: :state_province

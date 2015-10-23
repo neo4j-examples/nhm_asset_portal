@@ -1,6 +1,5 @@
 class Specimen < GraphStarter::Asset
-  has_images
-
+  property :title
   property :minimum_depth_in_meters
   property :record_type
   property :mineral_complex
@@ -132,6 +131,10 @@ class Specimen < GraphStarter::Asset
   property :meteorite_class
   property :label_locality
 
+  has_images
+
+  rated
+
   has_one :in, :donor, type: :DONATED, model_class: :Person
   has_one :out, :country, type: :FROM_COUNTRY
   has_one :out, :mine, type: :FROM_MINE
@@ -141,6 +144,7 @@ class Specimen < GraphStarter::Asset
   has_one :out, :collection, type: :IN_COLLECTION
   has_one :out, :sub_department, type: :IN_SUB_DEPARTMENT
 
-  self.category_association = :sub_department
+  name_property :catalog_number
+  category_association :sub_department
 end
 

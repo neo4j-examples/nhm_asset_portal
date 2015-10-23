@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+
+  root 'assets#home'
+
   devise_for :user
 
   mount GraphStarter::Engine => "/"

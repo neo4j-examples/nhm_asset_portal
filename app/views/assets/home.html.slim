@@ -1,0 +1,15 @@
+
+h1 Specimen count: #{@specimens.count}
+
+
+table
+  tr
+    th Sub-department
+    th Locality
+    th Specimen count
+  - SubDepartment.as(:sd).specimens(:s).locality(:loc).order('count(s) DESC').pluck(:sd, :loc, 'count(s)').each do |sub_department, locality, count|
+    tr
+      th = sub_department.title
+      th = locality.title
+      th = count
+
