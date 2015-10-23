@@ -24,7 +24,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'dotenv-rails', require: 'dotenv/rails-now', group: [:development, :test]
 
-gem 'graph_starter', '~> 0.3'
+gem 'graph_starter', '~> 0.4.0'
 
 gem 'scout_apm'
 
