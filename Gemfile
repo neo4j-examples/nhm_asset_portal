@@ -26,6 +26,8 @@ gem 'dotenv-rails', require: 'dotenv/rails-now', group: [:development, :test]
 
 gem 'graph_starter', '~> 0.3'
 
+gem 'scout_apm'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
