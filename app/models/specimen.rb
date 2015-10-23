@@ -135,6 +135,8 @@ class Specimen < GraphStarter::Asset
 
   rated
 
+  search_properties :catalog_number, :occurrence_id, :other_catalog_numbers, :_id
+
   has_one :in, :donor, type: :DONATED, model_class: :Person
   has_one :out, :country, type: :FROM_COUNTRY
   has_one :out, :mine, type: :FROM_MINE
