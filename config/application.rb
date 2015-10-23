@@ -27,6 +27,7 @@ module NhmAssetPortal
     # config.i18n.default_locale = :de
 
     config.neo4j.session_options = {initialize: { ssl: { verify: false }}}
+    config.neo4j.pretty_logged_cypher_queries = true
   end
 end
 
