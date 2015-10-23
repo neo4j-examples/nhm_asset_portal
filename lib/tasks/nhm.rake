@@ -77,7 +77,7 @@ namespace :nhm do
     vice_county
   )
   task import: :environment do
-    Neo4j::Session.query("MATCH n OPTIONAL MATCH n-[r]-() DELETE n, r")
+    Neo4j::Session.query("MATCH n OPTIONAL MATCH n-[r]-() DELETE n, r") if ENV['WIPE_FIRST']
 
     # Mentioning models so that constraints get created
     # See: https://github.com/neo4jrb/neo4j/issues/991
@@ -99,6 +99,8 @@ namespace :nhm do
       record.transform_keys!(&:underscore)
       record['nhm_class'] = record.delete('class')
       record.reject! {|_, v| v.nil? }
+
+      next if Specimen.find_by(title: record['catalog_number'])
 
       association_fields = %w(donor_name country mine sub_department state_province identification_variety locality collection).each_with_object({}) do |field, fields|
         fields[field] = record.delete(field)
@@ -129,12 +131,12 @@ namespace :nhm do
       end
 
       if association_fields['state_province'].present? && specimen.country
-        association_object = Neo4j::Session.current.query("MERGE (c:Country:Asset {title: {country_title}}) WITH c MERGE c<-[:IN_COUNTRY]-(sp:StateProvince:Asset {title: {state_province_title}}) RETURN sp", country_title: specimen.country.title, state_province_title: association_fields['state_province']).first.sp
+        association_object = Neo4j::Session.current.query("MATCH (c:Country:Asset {uuid: {country_uuid}}) WITH c MERGE c<-[:IN_COUNTRY]-(sp:StateProvince:Asset {title: {state_province_title}}) ON CREATE SET sp.uuid = {state_province_uuid} RETURN sp", state_province_title: association_fields['state_province'], country_uuid: specimen.country.uuid, state_province_uuid: SecureRandom.uuid).first.sp
         specimen.state_province = association_object
       end
 
       if association_fields['locality'].present? && specimen.state_province
-        association_object = Neo4j::Session.current.query("MERGE (sp:StateProvince:Asset {title: {state_province_title}}) WITH sp MERGE sp<-[:IN_STATE_PROVINCE]-(loc:Locality:Asset {title: {locality_title}}) RETURN loc", state_province_title: specimen.state_province.title, locality_title: association_fields['locality']).first.loc
+        association_object = Neo4j::Session.current.query("MATCH (sp:StateProvince:Asset {uuid: {state_province_uuid}}) WITH sp MERGE sp<-[:IN_STATE_PROVINCE]-(loc:Locality:Asset {title: {locality_title}}) ON CREATE SET loc.uuid = {locality_uuid} RETURN loc", state_province_uuid: specimen.state_province.uuid, locality_title: association_fields['locality'], locality_uuid: SecureRandom.uuid).first.loc
         specimen.locality = association_object
       end
 
@@ -142,19 +144,29 @@ namespace :nhm do
   end
 
   task import_images: :environment do
+    grouped_rows = {}
+    puts 'Loading CSV...'
     CSV.open(Rails.root.join('db/multimedia.csv'), headers: true).each do |row|
-      specimen = Specimen.find_by(_id: row['_id'])
+      grouped_rows[row['_id']] ||= []
+      grouped_rows[row['_id']] << row.to_hash
+    end
 
-      if !specimen.images.find_by(original_url: row['identifier'])
-        begin
-          image = ::GraphStarter::Image.create(source: row['identifier'], original_url: row['identifier'], title: row['title'], details: row.to_hash)
-        rescue OpenURI::HTTPError
-          nil
+    puts 'Going through specimens...'
+    Specimen.all.each do |specimen|
+      (grouped_rows[specimen._id] || []).each do |row|
+        specimen = Specimen.find_by(_id: row['_id'])
+
+        if !specimen.images.find_by(original_url: row['identifier'])
+          begin
+            image = ::GraphStarter::Image.create(original_url: row['identifier'], title: row['title'], details: row.to_hash)
+          rescue OpenURI::HTTPError
+            nil
+          end
+          specimen.images << image
+          putc '+'
+        else
+          putc '.'
         end
-        specimen.images << image
-        putc '+'
-      else
-        putc '.'
       end
     end
   end
