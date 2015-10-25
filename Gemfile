@@ -28,6 +28,8 @@ gem 'graph_starter', '~> 0.4.0'
 
 gem 'devise-neo4j'
 
+gem 'appsignal'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

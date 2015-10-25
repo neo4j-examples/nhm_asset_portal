@@ -39,6 +39,9 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
+    appsignal (0.11.17)
+      rack
+      thread_safe
     arel (6.0.3)
     aws-sdk (1.65.0)
       aws-sdk-v1 (= 1.65.0)
@@ -264,6 +267,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  appsignal
   aws-sdk (< 2.0)
   byebug
   coffee-rails (~> 4.1.0)
